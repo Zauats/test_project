@@ -1,32 +1,36 @@
 all: giveCreditPlease
 
 
-
-
-
-giveCreditPlease: main.o logic.o Record.o liblist.a
-	gcc -o giveCreditPlease main.o -L. -llist logic.h Record.h
+giveCreditPlease: main.o Record.o Node.o liblist.a liblogic.so
+	gcc -o giveCreditPlease main.c Record.h Node.h -L. -llist -llogic -Wl,-rpath,.
 
 main.o: main.c
 	gcc -c main.c
 
-liblist.a: listLibrary.o
-	ar cr liblist.a listLibrary.o
-
-listLibrary.o: listLibrary.h
-	gcc -c listLibrary.h
-
-logic.o: logic.h
-	gcc -c logic.h
+Node.o: Node.h
+	gcc -c Node.h
 
 Record.o: Record.h
 	gcc -c Record.h
 
+liblogic.so: logicLibrary.o
+	gcc -shared -o liblogic.so logicLibrary.o
+
+logicLibrary.o: logicLibrary.c
+	gcc -c -fPIC logicLibrary.c
+
+listLibrary.o: listLibrary.c
+	gcc -c listLibrary.c
+
+liblist.a: listLibrary.o
+	ar cr liblist.a listLibrary.o
 
 test.o: test.c list.h; gcc -c test.c
 test: test.o list.o; gcc -otest test.o list.o Unity/src/unity.c
 runtests: test ./testS
 
-
 clean:
-	rm --force *.o *.a *.a giveCreditPleaseS
+	rm --force *.o *.a *.so giveCreditPleaseS
+
+
+
